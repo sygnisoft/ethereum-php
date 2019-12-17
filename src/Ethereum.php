@@ -47,7 +47,7 @@ class Ethereum extends EthereumStatic implements Web3Interface
     private $id = 0;
     public $client;
     public $debugHtml = '';
-
+    private $debug = false;
 
     /**
      * Constructing Ethereum Class.
@@ -65,16 +65,18 @@ class Ethereum extends EthereumStatic implements Web3Interface
      * @param string $url
      *   Connection to Ethereum node. E.g:
      *   http://localhost:8545 or https://mainnet.infura.io/drupal.
+     * @param bool   $debug
      */
-    public function __construct(string $url = 'http://localhost:8545')
+    public function __construct(string $url = 'http://localhost:8545', bool $debug = false)
     {
+        $this->debug = $debug;
       // Require the workaround helpers, as autoload files in composer
       //   doesn't work as expected.
       require_once __DIR__ . '/helpers/ethereum-client-workaround-helpers.php';
 
       $this->client = RpcClient::factory($url, [
             // Debug JsonRPC requests.
-            'debug'     => false,
+            'debug'     => $debug,
             'rpc_error' => true,
         ]);
 
@@ -384,6 +386,9 @@ class Ethereum extends EthereumStatic implements Web3Interface
      */
     public function debug(string $title, $content = null)
     {
+        if (false === $this->debug) {
+            return;
+        }
         $return = '';
         $return .= '<p style="margin-left: 1em"><b>' . $title . "</b></p>";
         if ($content) {
